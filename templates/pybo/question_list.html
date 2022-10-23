@@ -1,11 +1,92 @@
+<!-- 기본 base.html을 상속받아옴 -->
+{% extends 'base.html' %} 
+
+<!-- 그 안에 구현하는 부분 작성 -->
+{% block content %}
+
+<div class="container my-3">
+    <table class="table">
+        <thead>
+            <tr class="thead-dark">
+                <th>Number</th>
+                <th>Subject</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <body>
+            {% if question_list %}
+            {% for question in question_list %} 
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="{% url 'pybo:detail' question.id %}">{{ question.subject }}</a>
+                </td>
+                <td>{{ question.create_date }}</td>
+            </tr>
+            {% endfor %}
+            
+            {% else %}
+                <tr>
+                    <td colspan="3">No question</td>
+                </tr>
+            {% endif %}            
+        </body>
+    </table>
+    <!-- paging -->
+    <ul class="pagination justify-content-center">
+        <!-- 이전 페이지 -->
+        {% if question_list.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ question_list.previous_page_number }}">Prev</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-diabled="true" href="#">Prev</a>
+        </li>
+        {% endif %}
+        <!-- Page list -->
+        {% for page_number in question_list.paginator.page_range %}
+            {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5 %}
+                {% if page_number == question_list.number %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page= {{ page_number }}">{{ page_number }}</a>
+                </li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        <!-- 다음 페이지 -->
+        {% if question_list.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ question_list.next_page_number }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-diabled="true" href="#">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+    <!-- add question -->
+    <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">Add question</a>
+</div>
+
+{% endblock %}
+
+
+
+<!-- 부트스트랩 적용 전 
 {% if question_list %}
     <ul>
         {% for question in question_list %}
-            <li><a href="{% url pybo:'detail' question.id %}">{{ question.subject }}</a></li> <!-- namespace와 별칭을 사용 -->
-            <!-- <li><a href="/pybo/{{ question.id }}/">{{ question.subject }}</a></li> --> <!-- URL 하드코딩스타일 -->
+            <li><a href="{% url 'pybo:detail' question.id %}">{{ question.subject }}</a></li> namespace와 별칭을 사용
+            <li><a href="/pybo/{{ question.id }}/">{{ question.subject }}</a></li>  URL 하드코딩스타일
         {% endfor %}
     </ul>
 {% else %}
     <p>No question</p>
 
 {% endif %}
+-->

@@ -1,5 +1,50 @@
-<h1>{{ question.subject }}</h1>
+<!-- 기본 base.html을 상속받아옴 -->
+{% extends 'base.html' %} 
 
-<div>
-    {{ question.content}}
+<!-- 그 안에 구현하는 부분 작성 -->
+{% block content %}
+
+<div class="container my-3">
+    <h2 class="border-bottom py-2">{{ question.subject }}</h2>
+    <div class="card-body">
+        <div class="card-text" style="white-space: pre-line;">{{ question.content }}</div>
+        <div class="d-flex justify-content-end">
+            <div class="badge badge-light p-2">{{ question.create_date }}</div>
+        </div>
+    </div>
+    <h5 class="border-bottom my-3 py-2">
+        {{ question.answer_set.count }} answers are exist
+    </h5>
+    {% for answer in question.answer_set.all %}
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space:pre-line;">{{ answer.content}}</div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <div class="badge badge-light p-2">{{ answer.create_date }}</div>
+        </div>
+    </div> 
+    {% endfor %}
+
+    <!-- 답변 등록 버튼 -->
+    <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
+        {% csrf_token %} <!-- 보안관련, form으로 전송된 데이터가 실제 웹 브라우저에서 작성된것인지 검사하는 역할, form 바로 아래에 항상 입력해야 한다-->
+        <!-- 오류표시 -->
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for field in form %}
+                {% if field.errors %}
+                <strong>{{ field.label }}</strong>
+                {{ field.errors }}
+                {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <textarea name="content" id="context" class="form-control" rows="10"></textarea>
+        </div>
+        <input type="submit" value="Answer" class="btn btn-primary">
+    </form>
 </div>
+
+{% endblock %}
